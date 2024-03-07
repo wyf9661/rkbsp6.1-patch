@@ -1,0 +1,60 @@
+name: Release Kernel Patches for rkbsp6.1
+
+on:
+  schedule:
+    - cron: "0 22 * * *"
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+run-name: Release Kernel Patches for rkbsp6.1
+
+jobs:
+  kernel:
+    runs-on: ubuntu-latest
+    name: Release Kernel Patches
+
+    steps:
+      - name: Get more disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          swap-storage: true
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Checkout LFS
+        shell: bash
+        run: git lfs fetch && git lfs checkout
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          sudo apt-get update && sudo apt-get upgrade -y
+      - name: Build
+        shell: bash
+        run: |
+          git clone https://github.com/amazingfate/linux-rockchip.git
+          cd linux-rockchip && git checkout -b rk-6.1-rkr1 remotes/origin/rk-6.1-rkr1
+          git format-patch 31ba856
+          tar zcvf rkbsp6.1_patch.tar.gz *.patch
+          sha512sum rkbsp6.1_patch.tar.gz > rkbsp6.1_patch_sha512sum
+
+      - name: Upload Kernel Patches to Release
+        uses: ncipollo/release-action@main
+        if: ${{ env.PACKAGED_STATUS }} == 'success' && !cancelled()
+        with:
+          tag: Nightly
+          artifacts: ./linux-rockchip/rkbsp6.1*
+          allowUpdates: true
+          removeArtifacts: false
+          replacesArtifacts: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          body: |
+            The kernel patches for rkbsp 6.1.
