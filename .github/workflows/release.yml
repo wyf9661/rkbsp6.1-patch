@@ -40,7 +40,7 @@ jobs:
       - name: Build
         shell: bash
         run: |
-          git clone https://github.com/amazingfate/linux-rockchip.git
+          git clone https://github.com/joshua-riek/linux-rockchip.git
           cd linux-rockchip && git checkout -b rk-6.1-rkr1 remotes/origin/rk-6.1-rkr1
           git format-patch 31ba856
           tar zcvf rkbsp6.1_patch.tar.gz *.patch
