@@ -40,9 +40,9 @@ jobs:
       - name: Build
         shell: bash
         run: |
-          git clone https://github.com/joshua-riek/linux-rockchip.git
-          cd linux-rockchip && git checkout -b rk-6.1-rkr1 remotes/origin/rk-6.1-rkr1
-          git format-patch 31ba856
+          git clone https://github.com/wyf9661/linux-rkbsp.git
+          cd linux-rkbsp
+          git format-patch 8af5308
           tar zcvf rkbsp6.1_patch.tar.gz *.patch
           sha512sum rkbsp6.1_patch.tar.gz > rkbsp6.1_patch_sha512sum
 
@@ -51,7 +51,7 @@ jobs:
         if: ${{ env.PACKAGED_STATUS }} == 'success' && !cancelled()
         with:
           tag: Nightly
-          artifacts: ./linux-rockchip/rkbsp6.1*
+          artifacts: ./linux-rkbsp/rkbsp6.1*
           allowUpdates: true
           removeArtifacts: false
           replacesArtifacts: true
